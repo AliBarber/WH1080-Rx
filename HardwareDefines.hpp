@@ -12,5 +12,6 @@
 
 #define RF_IN     14
 
+#define DEBUG   ON
 
 #endif
