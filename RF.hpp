@@ -13,6 +13,9 @@
 
 #define BUFFER_SIZE  16
 
-void rf_init();
+//bool rf_intFlag;
+//int rf_newVal;
 
+void rf_init();
+void rf_checkPulse();
 #endif

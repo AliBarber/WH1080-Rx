@@ -7,6 +7,6 @@ void debug_init()
 
 void debug_sendLong(char* message, long data)
 {
-  Serial.printf("%s:%d",message, data);
+  Serial.printf("%s:%d\n",message, data);
 }
 
