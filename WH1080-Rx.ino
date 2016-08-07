@@ -2,9 +2,10 @@
 #include "Display.hpp"
 #include "RF.hpp"
 #include "Debug.hpp"
+#include "DataBuffer.hpp"
 
-extern bool rf_intFlag;
-extern int  rf_newVal; 
+struct       WH1080Packet rx_data_buffer[DATA_BUFFER_SIZE];
+int          rx_data_buffer_idx = 0;
 
 void setup() {
   // put your setup code here, to run once:
@@ -16,10 +17,11 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-//  if(rf_intFlag)
-//  {
-//      rf_checkPulse();
-//      rf_intFlag = false;
-//  }
+  rf_loop();
+  if(rf_newDataFlag)
+  {
+          Serial.println("New data flag...");
+          disp_updateFromPacket(&rx_data_buffer[rx_data_buffer_idx-1]);
+          rf_newDataFlag = 0;
+  }
 }

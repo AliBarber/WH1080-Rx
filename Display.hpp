@@ -8,5 +8,7 @@
 
 void disp_setupDisplay();
 void disp_setBacklightLevel(int);
+void disp_updateFromPacket(struct WH1080Packet *packet);
+
 
 #endif

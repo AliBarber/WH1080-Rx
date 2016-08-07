@@ -16,6 +16,9 @@
 //bool rf_intFlag;
 //int rf_newVal;
 
+extern bool rf_newDataFlag;
+
 void rf_init();
 void rf_checkPulse();
+void rf_loop();
 #endif

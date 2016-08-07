@@ -6,6 +6,7 @@
 
 #include "RF.hpp"
 #include "Debug.hpp"
+#include "DataBuffer.hpp"
 
 byte byte_buffer[BUFFER_SIZE];
 byte buffer_idx = 0;
@@ -21,6 +22,7 @@ volatile long pulseNow;
 int val = 0;
 
 bool rf_intFlag;
+bool rf_newDataFlag = 0;
 int rf_newVal;
 int rf_intCount = 0;
 
@@ -43,13 +45,13 @@ void rf_checkPulse()
      *  If the pulse width (hi or low) is outside the
      *  range of the Fine Offset signal, then ignore them.
      */
-    debug_sendLong("Duration",duration);
+//    debug_sendLong("Duration",duration);
     if(duration < (SHORT_PULSE - SHORT_MARGIN) 
         || duration > (LONG_PULSE + LONG_MARGIN)) {
       // Meaningless pulse
       return;
     }
-    debug_sendLong("Pulse",rf_newVal);
+//    debug_sendLong("Pulse",rf_newVal);
     /*
      *  If we reach here, then we have seen a potentially
      *  valid pulse. Shift the bit into the register.
@@ -103,29 +105,42 @@ void rf_checkPulse()
     {
       if(buffer_idx > 0)
       {
-        Serial.print("Found:  ");
-        Serial.println(buffer_idx);
+//        Serial.print("Found:  ");
+//        Serial.println(buffer_idx);
         for(int i = 0; i < buffer_idx; i++) {
 //            for (byte mask = 0x80; mask; mask >>= 1) {
 //              Serial.print(mask & byte_buffer[i] ? '1' : '0');
 //            }
 //            Serial.print(' ');
-            Serial.println(byte_buffer[i]);
+//            Serial.println(byte_buffer[i]);
    
           }
         if(buffer_idx >= 2)
         {
-          int temp_raw = 0;
-          byte nibble_d = byte_buffer[1] & 0xF;
-          temp_raw = nibble_d << 8;
-          temp_raw = temp_raw | byte_buffer[2];
-          float temp_value = temp_raw - 0x190;
-          temp_value = temp_value / 10;
-          Serial.print("Temperature: ");
-          Serial.println(temp_value);
+//          int temp_raw = 0;
+//          byte nibble_d = byte_buffer[1] & 0xF;
+//          temp_raw = nibble_d << 8;
+//          temp_raw = temp_raw | byte_buffer[2];
+//          float temp_value = temp_raw - 0x190;
+//          temp_value = temp_value / 10;
+//          Serial.print("Temperature: ");
+//          Serial.println(temp_value);
+          if(rx_data_buffer_idx > DATA_BUFFER_SIZE)
+          {
+            Serial.println("Data Buffer overflow"); 
+          }
+          else
+          {
+            Serial.print("Pushing to buffer. idx: ");
+            Serial.println(rx_data_buffer_idx);
+            memcpy(rx_data_buffer[rx_data_buffer_idx].rx_data,byte_buffer,BUFFER_SIZE);
+            rx_data_buffer_idx++;
+            rf_newDataFlag = 1;
+          }
+
         }
-        buffer_idx = 0;
       }
+      buffer_idx = 0;
       shift_register = 0;
       bit_count = 0;
       sig_seen = 0;
@@ -134,21 +149,35 @@ void rf_checkPulse()
   }
 }
 
-void rf_ISR()
+void rf_loop()
 {
-  cli();
-  rf_newVal += digitalRead(RF_IN) ? 1 : 0;
-  delayMicroseconds(5); // Uuugh
-  rf_intCount++;
-  if(rf_intCount == 10)
+  rf_newVal = 0;
+  for(int i = 0; i < 10; i++)
   {
-     rf_intCount = 0;
-     rf_newVal = (rf_newVal + 5) / 10;
-     pulseNow = micros();
-     rf_checkPulse();
+    rf_newVal += digitalRead(RF_IN) ? 1 : 0;
+    delayMicroseconds(5);
   }
-  sei();
+
+  rf_newVal = (rf_newVal + 5) / 10;
+  pulseNow = micros();
+  rf_checkPulse();
 }
+
+//void rf_ISR()
+//{
+//  cli();
+//  rf_newVal += digitalRead(RF_IN) ? 1 : 0;
+//  delayMicroseconds(5); // Uuugh
+//  rf_intCount++;
+//  if(rf_intCount == 10)
+//  {
+//     rf_intCount = 0;
+//     rf_newVal = (rf_newVal + 5) / 10;
+//     pulseNow = micros();
+//     rf_checkPulse();
+//  }
+//  sei();
+//}
 
 void rf_init()
 {
@@ -156,6 +185,6 @@ void rf_init()
   rf_intFlag = false;
   rf_newVal = 0;
   pinMode(RF_IN,INPUT);
-  attachInterrupt(digitalPinToInterrupt(RF_IN),rf_ISR,CHANGE);
+//  attachInterrupt(digitalPinToInterrupt(RF_IN),rf_ISR,CHANGE);
 }
 
