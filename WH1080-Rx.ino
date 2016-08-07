@@ -3,6 +3,7 @@
 #include "RF.hpp"
 #include "Debug.hpp"
 #include "DataBuffer.hpp"
+#include "WiFi.hpp"
 
 struct       WH1080Packet rx_data_buffer[DATA_BUFFER_SIZE];
 int          rx_data_buffer_idx = 0;
@@ -14,6 +15,9 @@ void setup() {
   #ifdef DEBUG
   debug_init();
   #endif
+  delay(1000);
+  wifi_init();
+
 }
 
 void loop() {
