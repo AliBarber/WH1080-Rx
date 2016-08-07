@@ -14,3 +14,5 @@ Lots to do:
 
 Trying to write the code as asynchronously as possible (interrupt based) - although it's in quite a C style. Want to fork and bring nice neat C++ness? Please do!
 Also currently using teensyduino to get it up and running, might be a good idea to switch over to straight out Teensy Code/paradigms at some point.
+
+Branch __MVP__ is the Minimum Viable Product, slowly getting this to work!
