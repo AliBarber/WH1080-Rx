@@ -47,7 +47,7 @@ void _connectToAP()
   connection_init_stage = CONNECTING_TO_AP;
   String cmd = "AT+CWJAP=";
   cmd += "\"VM773740-2G\"";
-  cmd += ",\"PASSWORD\"";
+  cmd += ",\"ntshsyfp\"";
   Serial1.println(cmd);
 }
 
